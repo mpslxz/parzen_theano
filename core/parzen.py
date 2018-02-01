@@ -9,11 +9,20 @@ class ParzenWindow(object):
         self.window_size = T.constant(window_size)
         x = T.matrix()
         x_i = T.matrix()
+        self.kernel_fcn = kernel_fcn
+        self.window_fcn = window_fcn
 
-        x__ = kernel_fcn(h=self.window_size, x=x, x_i=x_i)
-        k_n = window_fcn(x__, h=self.window_size).sum()
-        self.get_win_samples = theano.function([x, x_i], k_n)
+        self._sample_prob, _ = theano.scan(sequences=x_i,
+                                           non_sequences=x,
+                                           fn=self._sample_probability)
+        self._get_prob_op = theano.function([x_i, x], self._sample_prob)
 
-    def estimate_probability(self, x_train, x_sample):
-        k_n = self.get_win_samples(x_train, x_sample)
-        return (1. * k_n / len(x_train)) / (self.window_size_val ** x_train.shape[1])
+    def _sample_probability(self, x_i, x):
+        x_i = x_i.reshape((1, -1))
+        x_i = T.addbroadcast(x_i, 0)
+        x__ = self.kernel_fcn(h=self.window_size, x=x, x_i=x_i)
+        k_n = self.window_fcn(x__, h=self.window_size).sum()
+        return (1. * k_n / x.shape[0]) / (self.window_size ** x.shape[1])
+
+    def estimate_probability(self, x_sample, x_train):
+        return self._get_prob_op(x_sample, x_train)
