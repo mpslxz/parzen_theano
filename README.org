@@ -1,0 +1,3 @@
+* Non parametric probability distribution estimation with Parzen window
+Currently, hypercube kernel is available.
+[[./plot.png]]
