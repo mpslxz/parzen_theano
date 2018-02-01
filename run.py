@@ -22,7 +22,7 @@ if __name__ == "__main__":
     x_train_uniform = np.random.uniform(-3, 3, (1000, 2)).astype('float32')
     x_sample = np.array([[0.5, 0]]).astype('float32')
     print "Exp. 2"
-    print "x_train \t--> 1000 2D points from uniform U(-1, 1)"
+    print "x_train \t--> 1000 2D points from uniform U(-3, 3)"
     print "x \t\t--> ", x_sample
     print "p(x) \t\t--> ", P.estimate_probability(x_sample, x_train_uniform)
     print 30 * "-"
