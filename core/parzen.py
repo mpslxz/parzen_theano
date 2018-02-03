@@ -1,5 +1,6 @@
 import theano
 import theano.tensor as T
+import numpy as np
 
 
 class ParzenWindow(object):
@@ -26,3 +27,12 @@ class ParzenWindow(object):
 
     def estimate_probability(self, x_sample, x_train):
         return self._get_prob_op(x_sample, x_train)
+
+    def max_posterior(self, x_train, y_train, x_sample):
+        labels = np.unique(y_train)
+        class_probs = []
+        for l in labels:
+            class_probs.append(self.estimate_probability(
+                x_sample, x_train[np.where(y_train == l)[0]]))
+        max_idx = np.argmax(np.array(class_probs))
+        return labels[max_idx], np.array(class_probs)[max_idx], np.array(class_probs)
