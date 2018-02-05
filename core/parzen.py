@@ -30,9 +30,9 @@ class ParzenWindow(object):
 
     def max_posterior(self, x_train, y_train, x_sample):
         labels = np.unique(y_train)
-        class_probs = []
-        for l in labels:
-            class_probs.append(self.estimate_probability(
-                x_sample, x_train[np.where(y_train == l)[0]]))
-        max_idx = np.argmax(np.array(class_probs))
-        return labels[max_idx], np.array(class_probs)[max_idx], np.array(class_probs)
+        class_probs = np.zeros((x_sample.shape[0], len(labels)))
+        for idx, l in enumerate(labels):
+            class_probs[:, idx] = self.estimate_probability(
+                x_sample, x_train[np.where(y_train == l)[0]])
+        max_idx = np.argmax(class_probs, axis=1)
+        return labels[max_idx], [i[max_idx[j]] for j, i in enumerate(class_probs)], class_probs
